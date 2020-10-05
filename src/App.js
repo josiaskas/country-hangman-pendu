@@ -1,129 +1,154 @@
 import React, {Component} from 'react';
 import './App.css';
-import  KeyBoard from './KeyBoard';
 
-import step0 from "./images/0.jpg";
-import step1 from "./images/1.jpg";
-import step2 from "./images/2.jpg";
-import step3 from "./images/3.jpg";
-import step4 from "./images/4.jpg";
-import step5 from "./images/5.jpg";
-import step6 from "./images/6.jpg";
+import  KeyBoard from './components/KeyBoard';
+import Display from './components/Display';
+import ScoreBoard from './components/Score';
 
-const words = [
-  'histoire',
-  'geographie',
-  'mathematiques',
-  'chimie'
-]
 
+import CountryApi from './Country';
+const Countries = new CountryApi();
+
+const DEFAULT_STATE = { 
+  score : 0,
+  failed:0,
+  blockedKeys : [],
+  display: [''],
+  gameIsOver: false,
+  isAwin: false,
+  word:'',
+  tips:[],
+  tipsDisplayed:[],
+  loading:true,
+}
 class App extends Component{
-
-  images= [step0, step1, step2, step3, step4, step5, step6];
-
-  DEFAULT_STATE = { score : 0,
-    guesses:0,
-    word : 'Hello',
-    edition : '',
-    display: ['_'],
-    image: this.images[0]
-  }
   constructor(props){
     super(props);
-    this.state = {
-      score : 0,
-      guesses:0,
-      word : 'salut',
-      edition : '',
-      display: ['_'],
-      image: this.images[0],
-    }
+    this.state ={...DEFAULT_STATE};
     this.receivingKey = this.receivingKey.bind(this);
   }
-  receivingKey(key){
-    const indexes = this.checkLetter(key);
-
-    if(this.state.guesses <= 5){
-      let display = this.state.display;
-      if (indexes.length > 0) {
-          for (const index of indexes) {
-            display[index]= key;
-            this.setState({score : this.state.score+1});
-          }
-          this.setState({edition : this.state.edition+key, display : display});
-      }else{
+  receivingKey(key,code){
+    const touch = {key,code}
+    console.log(touch);
+    if (!this.state.gameIsOver) {
+      const matchIndexes = touch.code !=="" ? this.checkLetter(touch.key) : [];
+      if (matchIndexes.length !== 0) {
+      this.correctKey(touch,matchIndexes);
+      } 
+      else {
+        const failed = this.state.failed+1;
+        const tips = this.state.tipsDisplayed.slice();
+        tips.push(this.state.tips[failed-1]);
         this.setState({
-          image : this.images[this.state.guesses+1],
-          guesses : this.state.guesses+1
-        });
+          failed: failed,
+          tipsDisplayed:tips,
+        })
+        if(failed >= 6){
+          this.setState({
+            gameIsOver: true,
+            isAwin: false,
+          })
+          setTimeout(() => {
+            this.restartGame(true)
+          }, 2000);
+        }
       }
-      if (this.state.score === this.state.word.length) {
-        this.gameIsOver(true);
-      }
-      return;
+
     }
-    this.gameIsOver(false);
+    
   }
-  gameIsOver(isAWin){
-    if (isAWin) {
-      
-      setTimeout(() => {
-        this.restartGame();
-      }, 2000);
-    } else {
-      
-      setTimeout(() => {
-        this.restartGame();
-      }, 2000);
-    }
-  }
-  blockedKeys(){
-    const blocked = [];
-    for (const key of this.state.edition){
-      const code =`Key${key}`;
-      blocked.push(code);
-    }
-    return blocked
-  }
+
   checkLetter(key){
     let indexes =[], i=-1;
-    while ((i = this.state.word.indexOf(key, i+1)) !== -1){
-        indexes.push(i);
+    const word = this.state.word.split('');
+    while ((i = word.indexOf(key, i+1)) !== -1){
+      indexes.push(i);
     }
     return indexes;
   }
+  correctKey(touch, matchIndexes){
+    const display = [...this.state.display];
+    const score = this.state.score + matchIndexes.length;
+    const blockedKeys = [...this.state.blockedKeys];
+    blockedKeys.push(touch.code);
+    for (const index of matchIndexes) {
+        display[index] = touch.key;
+    }
+    this.setState({
+      display : display,
+      score:score,
+      blockedKeys : blockedKeys,
+    })
+    if(score >= this.state.word.length){
+      this.setState({
+        gameIsOver: true,
+        isAwin: true,
+      })
+      // 
+      setTimeout(() => {
+        this.restartGame(true)
+      }, 2000);
+    }
+  }
+  restartGame(isAnotherGame=false){
+    if(isAnotherGame){
+      console.log('fin du jeu - bilan');
+    }else{
+      console.log('Welcome');
+    }
+    this.fetchAword();
+    const state = {...DEFAULT_STATE};
+    this.setState({...state});
+  }
   render(){
-    return(
-      <div className="App">
-        <header className="App-header">
-          <h2>
-             Guesses: {this.state.guesses}
-            <span id="score"> Score : {this.state.score} / {this.state.word.length}</span>
-          </h2>
-        </header>
-        <main>
-          <div>
-            <img src={this.state.image} alt="level"/>
-            <p id="edition">{this.state.display.join(' ')}</p>
-          </div>
-          <KeyBoard reciever={this.receivingKey} blockedKeys={this.blockedKeys()}/>
-        </main>
-      </div>
-    )
+    if (!this.state.loading) {
+        return(
+          <div className="App">
+            <header className="App-header">
+            <ScoreBoard 
+              fail={this.state.failed} 
+              score={this.state.score} 
+              word={this.state.word} 
+              tips={this.state.tipsDisplayed}/>
+            </header>
+            <main>
+              <Display 
+                isOver={this.state.gameIsOver} 
+                isAwin={this.state.isAwin} 
+                show={this.state.display}/>
+                
+              <KeyBoard reciever={this.receivingKey} blockedKeys={this.state.blockedKeys}/>
+            </main>
+            <footer>
+
+            </footer>
+          </div>  
+        )
+    }
+    else{
+      return(
+        <div className="App">
+          <p> En charge</p>
+        </div>
+        
+      )
+    }
   }
-  restartGame(){
-    this.setState({...this.DEFAULT_STATE});
-    this.fetchWord();
-  }
-  fetchWord(){
-    //can become more complex after
-    const word = words[Math.floor(Math.random() * words.length)];
-    this.setState({word : word.toUpperCase()});
-    this.setState({display : '_'.repeat(word.length).split('')});
+  fetchAword(){
+    Countries.getCountry().then((Country)=>{
+      this.setState({
+        word : Country.name.toUpperCase(),
+        display : '_'.repeat(Country.name.length).split(''),
+        tips : Country.tips,
+        loading:false
+      })
+    });
   }
   componentDidMount(){
-    this.fetchWord();
+    this.restartGame();
   }
+
+
 }
 
 export default App;

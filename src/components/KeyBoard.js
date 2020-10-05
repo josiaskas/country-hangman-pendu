@@ -30,7 +30,7 @@ class KeyBoard extends Component {
     }
     handleKeyUp(event){
        // const {key, code} = event;
-        this.sendSelectedkey()
+        this.sendSelectedkey(false); //false we do not treat functions
         this.setState({selectedKey : ''});
 
     }
@@ -52,10 +52,10 @@ class KeyBoard extends Component {
     }
     sendSelectedkey(options){
         if(options){
-            this.props.reciever(this.state.selectedKey);
+            this.props.reciever(this.state.selectedKey, this.state.selectedKey);
         }else{
             if (!this.props.blockedKeys.includes(this.state.selectedKey)) {
-                this.props.reciever(this.state.selectedKey.slice(3));
+                this.props.reciever(this.state.selectedKey.slice(3),this.state.selectedKey);
             }
         }
     }
@@ -106,6 +106,10 @@ class KeyBoard extends Component {
         document.addEventListener('keydown',this.handleKeyDown);
         document.addEventListener('keyup',this.handleKeyUp);
         
+    }
+    componentWillUnmount(){
+        document.removeEventListener("keydown", this.handleKeyDown);
+        document.removeEventListener("keyup", this.handleKeyUp);
     }
 }
 
