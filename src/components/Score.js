@@ -32,24 +32,26 @@ class ScoreBoard extends Component{
                 <h2>Failed: {this.props.fail}
                     <span id="score"> Score : {this.props.score} / {this.props.word.length}</span>
                 </h2>
-                <div className="tipsSection">
-                    <h3>Tips</h3>
-                    <ul id="Tips">
-                        {this.props.tips.map((tip,index) => {
-                            if (index === 3) {
-                                return(
-                                    <li key={index}><img className="flag" src={tip} alt="flag"/></li>
-                                )
-                            } else {
-                                return(
-                                    <li key={index}>{tip}</li>
-                                )
-                            }
-                            
-                        })}
-                    </ul>
+                <div className="centrer">
+                    <div className="tipsSection">
+                        <h3>Tips</h3>
+                        <ul id="Tips">
+                            {this.props.tips.map((tip,index) => {
+                                if (index === 3) {
+                                    return(
+                                        <li key={index}><img className="flag" src={tip} alt="flag"/></li>
+                                    )
+                                } else {
+                                    return(
+                                        <li key={index}>{tip}</li>
+                                    )
+                                }
+                                
+                            })}
+                        </ul>
+                    </div>
+                    <img id="ImageScore" src={this.image()} alt="level"/> 
                 </div>
-                <img id="ImageScore" src={this.image()} alt="level"/>
             </div>
         );
     }

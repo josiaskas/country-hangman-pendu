@@ -21,7 +21,7 @@
     -o-transform: rotateX(15deg);
 }
 .keyboard #main {
-    padding: 1.5px;
+    padding: 1.5px 0 1.5px 1.5px;
     background: #4d4d4d;
     border-radius: 3px;
     overflow: hidden;
@@ -189,3 +189,73 @@
 .keyboard #addition {
     overflow: hidden;
 }
+
+
+@media only screen and (max-width: 600px) {
+    #KeyboardSection{
+        min-width: 351px;
+    }
+    .keyboard {
+        width:342px;
+        padding: 13px 3.6px 5.85px;
+    }
+    .key, .f_key {
+        width: 18px;
+        height: 20.25px;
+        margin: 1px;
+        border-width: 1px 3px 4px;
+        border-radius: 2px;
+        box-shadow: 0 0 4.5px rgba(0, 0, 0, 0.2), inset 0 0 2px rgba(0, 0, 0, 0.3);
+    }
+    .key .keycap {
+        width: 14.85px;
+        height: 18px;
+        padding: 2.25px 0 0 3.15px;
+        font-size: 10px;
+        line-height: 1;
+        box-shadow: 0 0 4.5px rgba(0, 0, 0, 0.15);
+        border-radius: 2px;
+    }
+    .k18.left {
+        width: 17px;
+        border-right-width: 4px;
+    }
+    .k18.right {
+        width: 18px;
+        border-left-width: 0px;
+    }
+    .keycap {
+        width: 13.5px;
+    }
+    .k91, .k93 {
+        width: 32.4px;
+    }
+    .k91 .top, .k93 .top {
+        font-size: 7.8px;
+    }
+    .k91 .bottom, .k93 .bottom {
+        font-size: 12px;
+    }
+    .k91.left {
+        border-right-width: 4.5px;
+    }
+    .k93.right {
+        border-left-width: 4.5px;
+    }
+    .k32 {
+        width: 147.6px;
+        border-width: 1.35px 3.6px 4.5px;
+    }
+    
+    .k32 .keycap {
+        width: 144.6px;
+    }
+    .keyboard #addition_wrap {
+        width: 292.5px;
+        margin: 0px 0px 0px 15px;
+        padding: 0 0px 2px;
+        background: #4d4d4d;
+        border-radius: 0 0 3px 3px;
+        position: relative;
+    }
+  }
